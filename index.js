@@ -50,25 +50,40 @@ function calculateCost(order) {
 }
 
 // API endpoint
-app.post("/calculate", (req, res) => {
-  const order = req.body;
 
-  if (!order || typeof order !== "object" || Object.keys(order).length === 0) {
-    return res.status(400).json({ error: "Invalid input" });
-  }
 
-  const cost = calculateCost(order);
-  res.json({ cost });
-});
 
-app.get("/", (req, res) => {
-    res.send("API is live. Use POST /calculate");
-  });
-
-  
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+// Single route for both GET and POST
+app.all("/", (req, res) => {
+    if (req.method === "GET") {
+      res.send(`
+        <h2>Welcome to Delivery Cost API</h2>
+        <p>Use <code>POST /</code> with JSON body like:</p>
+        <pre>{
+    "A": 1,
+    "G": 1,
+    "H": 1,
+    "I": 3
+  }</pre>
+        <p>to get delivery cost.</p>
+      `);
+    } else if (req.method === "POST") {
+      const order = req.body;
+  
+      if (!order || typeof order !== "object" || Object.keys(order).length === 0) {
+        return res.status(400).json({ error: "Invalid input. Send JSON body." });
+      }
+  
+      const cost = calculateCost(order);
+      res.json({ cost });
+    } else {
+      res.status(405).send("Method Not Allowed");
+    }
+  });
 
 
 
