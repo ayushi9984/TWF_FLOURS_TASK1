@@ -61,6 +61,18 @@ app.post("/calculate", (req, res) => {
   res.json({ cost });
 });
 
+app.get("/", (req, res) => {
+    res.send("API is live. Use POST /calculate");
+  });
+
+  
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+
+
+
+
+
+
