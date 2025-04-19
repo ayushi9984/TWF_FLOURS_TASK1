@@ -58,36 +58,22 @@ app.listen(PORT, () => {
 });
 
 // Single route for both GET and POST
-app.all("/", (req, res) => {
-    if (req.method === "GET") {
-      res.send(`
-        <h2>Welcome to Delivery Cost API</h2>
-        <p>Use <code>POST /</code> with JSON body like:</p>
-        <pre>{
-    "A": 1,
-    "G": 1,
-    "H": 1,
-    "I": 3
-  }</pre>
-        <p>to get delivery cost.</p>
-      `);
-    } else if (req.method === "POST") {
-      const order = req.body;
-  
-      if (!order || typeof order !== "object" || Object.keys(order).length === 0) {
-        return res.status(400).json({ error: "Invalid input. Send JSON body." });
-      }
-  
-      const cost = calculateCost(order);
-      res.json({ cost });
-    } else {
-      res.status(405).send("Method Not Allowed");
-    }
-  });
+app.get("/", (req, res) => {
+  res.send(`
+    <h2>Delivery Cost Calculator</h2>
+    <form method="POST" action="/">
+      <textarea name="order" rows="10" cols="50" placeholder='Enter order JSON like {"A":1,"G":1}'></textarea><br><br>
+      <button type="submit">Calculate Cost</button>
+    </form>
+  `);
+});
 
-
-
-
-
-
-
+app.post("/", express.urlencoded({ extended: true }), (req, res) => {
+  try {
+    const order = JSON.parse(req.body.order);
+    const cost = calculateCost(order);
+    res.send(`<h2>Total Delivery Cost: ${cost}</h2><a href="/">← Back</a>`);
+  } catch (err) {
+    res.send(`<p style="color:red">Invalid JSON format.</p><a href="/">← Back</a>`);
+  }
+});
